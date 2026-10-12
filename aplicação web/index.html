@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Champions Card</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="logo-container" id="logo-container-fixed">
+    <img src="./CHAMPIONS_CARD.png" alt="Champions Card" class="logo-champions">
+  </div>
+
+  <div class="particle" id="particle"></div>
+
+  <!-- TELA 1: LOGIN -->
+  <div class="screen active" id="screen-login">
+    <div class="card card-login">
+      <h1 class="title">CHAMPIONS <span class="highlight">CARD</span></h1>
+      <input type="email" id="login-email" class="input-field" placeholder="E-MAIL" />
+      <input type="password" id="login-senha" class="input-field" placeholder="SENHA" />
+      <button class="btn-primary" onclick="fazerLogin()">FAZER LOGIN</button>
+      <p class="link-text">NÃO TENHO LOGIN: <a href="javascript:void(0)" class="link-destaque" onclick="irPara('screen-cadastro')">FAZER CADASTRO</a></p>
+
+      <!-- BOTÃO TOGGLE SÓCIO -->
+      <div class="socio-toggle-wrap">
+        <button id="btn-toggle-socio-login" class="btn-socio-toggle" onclick="toggleOpcaoSocioLogin()">
+          QUERO SER SÓCIO
+        </button>
+      </div>
+
+      <!-- PAINEL SÓCIO (expandível) -->
+      <div id="login-socio-painel" class="login-socio-painel">
+        <p class="socio-painel-titulo">🎫 ESCOLHA SEU PLANO</p>
+        <p class="socio-painel-subtitulo">Selecione o plano e pague para se tornar sócio</p>
+
+        <div id="login-planos-socio" class="login-planos-socio"></div>
+
+        <div id="login-socio-pagamento" class="login-socio-pagamento hidden">
+          <div class="metodos-pagamento" id="login-metodos-adesao">
+            <button class="btn-metodo active" onclick="selecionarMetodoAdesaoLogin('credito', this)">CRÉDITO</button>
+            <button class="btn-metodo" onclick="selecionarMetodoAdesaoLogin('debito', this)">DÉBITO</button>
+            <button class="btn-metodo" onclick="selecionarMetodoAdesaoLogin('pix', this)">PIX</button>
+          </div>
+
+          <div id="login-campos-cartao-adesao" style="display:flex;flex-direction:column;gap:10px;">
+            <input type="text" class="input-field" placeholder="NÚMERO DO CARTÃO" maxlength="19" />
+            <div class="inline-inputs">
+              <input type="text" class="input-field" placeholder="MM/AA" maxlength="5" />
+              <input type="text" class="input-field" placeholder="CVV" maxlength="4" />
+            </div>
+          </div>
+
+          <div id="login-pix-adesao" class="pix-container hidden">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=ingressos@ticketfut.com.br" alt="QR Code PIX" class="qrcode"/>
+            <p class="pix-chave">CHAVE PIX: ingressos@ticketfut.com.br</p>
+          </div>
+
+          <button class="btn-primary btn-confirmar-socio" onclick="confirmarSocioLogin()">
+            CONFIRMAR E ASSINAR
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TELA 2: CADASTRO -->
+  <div class="screen" id="screen-cadastro">
+    <div class="card">
+      <h1 class="title"><span class="highlight-cyan">CADASTRO</span></h1>
+      <input type="text" id="cad-nome" class="input-field" placeholder="NOME COMPLETO" />
+      <input type="text" id="cad-cpf" class="input-field" placeholder="CPF" />
+      <input type="email" id="cad-email" class="input-field" placeholder="E-MAIL" />
+      <input type="password" id="cad-senha" class="input-field" placeholder="SENHA" />
+
+      <select id="cad-time" class="input-field select-field select-time">
+        <option value="">FILIAÇÃO (TIME)</option>
+        <option>Palmeiras</option>
+        <option>Corinthians</option>
+        <option>Flamengo</option>
+        <option>São Paulo</option>
+        <option>Santos</option>
+      </select>
+
+      <select id="cad-plano" class="input-field select-field">
+        <option value="0">SEM PLANO (SÓ INGRESSO)</option>
+        <option value="5">SÓCIO BRONZE - 5% DESC.</option>
+        <option value="10">SÓCIO PRATA - 10% DESC.</option>
+        <option value="20">SÓCIO OURO - 20% DESC.</option>
+      </select>
+
+      <div id="secao-pagamento-cadastro" class="hidden" style="display:flex;flex-direction:column;gap:14px;">
+        <div id="cad-bloco-credito" class="secao-cartao">
+          <p class="label-pagamento">CARTÃO DE CRÉDITO:</p>
+          <input type="text" id="cad-credito-numero" class="input-field" placeholder="NÚMERO DO CARTÃO" maxlength="19" />
+          <div class="inline-inputs">
+            <input type="text" id="cad-credito-validade" class="input-field" placeholder="MM/AA" maxlength="5" />
+            <input type="text" id="cad-credito-cvv" class="input-field" placeholder="CVV" maxlength="4" />
+          </div>
+        </div>
+
+        <div id="cad-bloco-debito" class="secao-cartao">
+          <p class="label-pagamento">CARTÃO DE DÉBITO:</p>
+          <input type="text" id="cad-debito-numero" class="input-field" placeholder="NÚMERO DO CARTÃO" maxlength="19" />
+          <div class="inline-inputs">
+            <input type="text" id="cad-debito-validade" class="input-field" placeholder="MM/AA" maxlength="5" />
+            <input type="text" id="cad-debito-cvv" class="input-field" placeholder="CVV" maxlength="4" />
+          </div>
+        </div>
+
+        <button class="btn-pix-toggle" id="btn-pix-toggle" onclick="togglePixCad()">PAGAR POR PIX</button>
+        <div id="cad-bloco-pix" class="pix-container hidden">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=ingressos@ticketfut.com.br" alt="QR Code PIX" class="qrcode"/>
+          <p class="pix-chave">CHAVE PIX: ingressos@ticketfut.com.br</p>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="finalizarCadastro()">FINALIZAR E ACESSAR</button>
+    </div>
+  </div>
+
+  <!-- TELA 3: PARTIDAS -->
+  <div class="screen" id="screen-partidas">
+    <div class="card-partidas">
+      <div class="partidas-coluna">
+        <h1 class="title">PARTIDAS <span class="highlight-green">DISPONÍVEIS</span></h1>
+        <div id="lista-partidas" class="lista-partidas"></div>
+        <button class="btn-sair" onclick="sair()">SAIR</button>
+      </div>
+      <div class="noticias-coluna">
+        <h2 class="title-noticias">NOTÍCIAS DO TIME</h2>
+        <div id="noticia-time" class="noticia-box"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA 4: MAPA DA ARENA -->
+  <div class="screen" id="screen-mapa">
+    <div class="card">
+      <h1 class="title">MAPA DA <span class="highlight-green">ARENA</span></h1>
+
+      <div id="aviso-visitante" class="aviso-visitante" style="display:none;">
+        ⚠️ Seu time é o <strong>visitante</strong>. Apenas o setor <strong>LESTE</strong> está disponível.
+      </div>
+      <div id="aviso-mandante" class="aviso-visitante" style="display:none;border-color:#e53935;color:#e53935;">
+        🚫 O setor <strong>LESTE</strong> é exclusivo para a <strong>torcida visitante</strong>.
+      </div>
+
+      <div class="arena-map">
+        <div class="setor setor-norte" onclick="escolherSetor('Norte')">NORTE</div>
+        <div class="arena-meio">
+          <div class="setor setor-lado" onclick="escolherSetor('Oeste')">OESTE</div>
+          <div class="gramado">GRAMADO</div>
+          <div class="setor setor-lado">LESTE</div>
+        </div>
+        <div class="setor setor-sul" onclick="escolherSetor('Sul')">SUL</div>
+      </div>
+      <button class="btn-sair" onclick="irPara('screen-partidas')">VOLTAR</button>
+    </div>
+  </div>
+
+  <!-- TELA 5: PAGAMENTO -->
+  <div class="screen" id="screen-pagamento">
+    <div class="card">
+      <h1 class="title">RESUMO & <span class="highlight-green">PAGAMENTO</span></h1>
+      <div class="resumo-box">
+        <p id="resumo-partida" class="resumo-partida"></p>
+        <p id="resumo-total" class="resumo-total"></p>
+      </div>
+
+      <div id="bloco-codigo-socio" class="bloco-codigo-socio" style="display:none;">
+        <p class="label-pagamento" style="color:var(--neon-cyan);margin-bottom:6px;">🎫 CÓDIGO DE SÓCIO (obrigatório para desconto)</p>
+        <input type="text" id="input-codigo-socio" class="input-field input-codigo-socio"
+               placeholder="SEU CÓDIGO DE SÓCIO" maxlength="6"
+               oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6)" />
+      </div>
+
+      <div class="metodos-pagamento" id="metodos-compra">
+        <button class="btn-metodo active" onclick="selecionarMetodoCompra('credito', this)">CRÉDITO</button>
+        <button class="btn-metodo" onclick="selecionarMetodoCompra('debito', this)">DÉBITO</button>
+        <button class="btn-metodo" onclick="selecionarMetodoCompra('pix', this)">PIX</button>
+      </div>
+
+      <div id="campos-cartao-compra" style="display:flex;flex-direction:column;gap:12px;">
+        <input type="text" class="input-field" placeholder="NÚMERO DO CARTÃO" />
+        <div class="inline-inputs">
+          <input type="text" class="input-field" placeholder="MM/AA" />
+          <input type="text" class="input-field" placeholder="CVV" />
+        </div>
+      </div>
+
+      <div id="pix-compra" class="pix-container hidden">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=ingressos@ticketfut.com.br" alt="QR Code PIX" class="qrcode"/>
+        <p class="pix-chave">CHAVE PIX: ingressos@ticketfut.com.br</p>
+      </div>
+
+      <button class="btn-primary" onclick="confirmarCompra()">CONFIRMAR COMPRA</button>
+      <button class="btn-sair" onclick="irPara('screen-mapa')">VOLTAR</button>
+    </div>
+  </div>
+
+  <!-- TELA 6: CONFIRMAÇÃO DE COMPRA (#5) -->
+  <div class="screen" id="screen-confirmacao">
+    <div class="card confirm-card">
+      <!-- SEM logo no canto superior — logo fica embaixo -->
+
+      <div class="confirm-check">✅</div>
+      <h2 id="confirm-titulo" class="confirm-titulo">COMPRA CONFIRMADA!</h2>
+      <p id="confirm-subtitulo" class="confirm-subtitulo">ENVIAMOS O INGRESSO NO SEU E-MAIL</p>
+      <p class="confirm-detalhe">Verifique sua caixa de entrada e aproveite o jogo! 🎉</p>
+
+      <!-- Logo Champions Card animada embaixo (#5) -->
+      <div class="confirm-logo-wrap">
+        <div id="confirm-logo-time" class="confirm-logo-time"></div>
+        <img src="./CHAMPIONS_CARD.png" alt="Champions Card" class="confirm-logo-champions">
+      </div>
+
+      <button class="btn-primary" onclick="irPara('screen-partidas')" style="margin-top:8px;">VER MAIS PARTIDAS</button>
+      <button class="btn-sair" onclick="sair()">SAIR</button>
+    </div>
+  </div>
+
+  <!-- WIDGET VLIBRAS -->
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>
+    new window.VLibras.Widget('https://vlibras.gov.br/app');
+  </script>
+
+  <!-- SCRIPTS ORGANIZADOS -->
+  <!-- 1. Banco de dados (localStorage) -->
+  <script src="js/db.js"></script>
+  <!-- 2. Dados estáticos (partidas, logos, temas, notícias) -->
+  <script src="js/dados.js"></script>
+  <!-- 3. Estado global, navegação e utilitários -->
+  <script src="js/estado.js"></script>
+  <!-- 4. Splash / tela de confirmação -->
+  <script src="js/splash.js"></script>
+  <!-- 5. Tela 1: Login -->
+  <script src="js/tela-login.js"></script>
+  <!-- 6. Tela 2: Cadastro -->
+  <script src="js/tela-cadastro.js"></script>
+  <!-- 7. Tela 3: Partidas -->
+  <script src="js/tela-partidas.js"></script>
+  <!-- 8. Tela 4: Mapa da Arena -->
+  <script src="js/tela-mapa.js"></script>
+  <!-- 9. Tela 5: Pagamento -->
+  <script src="js/tela-pagamento.js"></script>
+
+  <!-- Inicialização -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      aplicarMascarasCartao();
+      inicializarLogoHover();
+      irPara('screen-login', false);
+    });
+  </script>
+
+</body>
+</html>
+
+  <script src="script.js"></script> 
+</body>
+</html>
+
