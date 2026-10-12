@@ -1,0 +1,35 @@
+# Sobe SQL Server + backend C# + microsserviço Python.
+# Uso:  cp .env.example .env   (edite os valores)  &&  docker compose up --build
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SQL_PASSWORD}
+    ports: ["1433:1433"]
+    volumes: [sqldata:/var/opt/mssql]
+
+  face-service:
+    build: ./face-service
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      API_KEY: ${FACE_API_KEY}
+      EMBEDDER: ${FACE_EMBEDDER:-insightface}
+    # NÃO publicamos porta: só o backend enxerga este serviço (rede interna do compose)
+    expose: ["8000"]
+
+  api:
+    build: ./backend
+    depends_on: [db, face-service]
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ENVIRONMENT:-Development}
+      ConnectionStrings__Default: "Server=db,1433;Database=TicketFut;User Id=sa;Password=${SQL_PASSWORD};TrustServerCertificate=True"
+      Database__AutoCreate: "true"
+      Jwt__Key: ${JWT_KEY}
+      Face__BaseUrl: http://face-service:8000
+      Face__ApiKey: ${FACE_API_KEY}
+      Face__EncryptionKey: ${FACE_ENCRYPTION_KEY}
+    ports: ["8080:8080"]
+
+volumes:
+  sqldata:

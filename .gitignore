@@ -1,0 +1,9 @@
+.env
+bin/
+obj/
+.dart_tool/
+build/
+*.g.dart
+__pycache__/
+.pytest_cache/
+.venv/
